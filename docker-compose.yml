@@ -1,0 +1,47 @@
+version: "3.7"
+services:
+  backend:
+    image: frappe/bench:latest
+    container_name: hrms-backend
+    volumes:
+      - ..:/workspace  # Live code mount
+      - sites-vol:/workspace/install/sites
+      - apps-vol:/workspace/install/apps
+    working_dir: /workspace
+    ports:
+      - "8000:8000"
+      - "9000:9000"
+    environment:
+      - DOCKER=true
+    depends_on:
+      - redis-cache
+      - redis-queue
+      - redis-socketio
+      - mariadb
+    command: >
+      bash -c "sleep infinity"  # Start with shell for init.sh or manual setup
+
+  redis-cache:
+    image: redis:alpine
+    container_name: redis-cache
+
+  redis-queue:
+    image: redis:alpine
+    container_name: redis-queue
+
+  redis-socketio:
+    image: redis:alpine
+    container_name: redis-socketio
+
+  mariadb:
+    image: mariadb:10.6
+    container_name: mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - mariadb-vol:/var/lib/mysql
+
+volumes:
+  mariadb-vol:
+  sites-vol:
+  apps-vol:
